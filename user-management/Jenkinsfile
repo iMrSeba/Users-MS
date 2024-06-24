@@ -9,20 +9,20 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh 'docker build -t iMrSeba/Users-MS:latest .'
+                sh 'docker build -t iMrSeba/Users-MS.git:latest .'
             }
         }
         stage('Push') {
             steps {
                 withCredentials([string(credentialsId: 'dockerhub-credentials', variable: 'DOCKER_HUB_PASSWORD')]) {
                     sh 'echo $DOCKER_HUB_PASSWORD | docker login -u iMrSeba --password-stdin'
-                    sh 'docker push iMrSeba/Users-MS:latest'
+                    sh 'docker push iMrSeba/Users-MS.git:latest'
                 }
             }
         }
         stage('Deploy') {
             steps {
-                sh 'kubectl set image deployment/Users-MS Users-MS=iMrSeba/Users-MS:latest --namespace=default'
+                sh 'kubectl set image deployment/Users-MS.git Users-MS=iMrSeba/Users-MS.git:latest --namespace=default'
             }
         }
     }
