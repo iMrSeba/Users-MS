@@ -1,0 +1,29 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/iMrSeba/Users-MS.git'
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'docker build -t iMrSeba/Users-MS:latest .'
+            }
+        }
+        stage('Push') {
+            steps {
+                withCredentials([string(credentialsId: 'dockerhub-credentials', variable: 'DOCKER_HUB_PASSWORD')]) {
+                    sh 'echo $DOCKER_HUB_PASSWORD | docker login -u iMrSeba --password-stdin'
+                    sh 'docker push iMrSeba/Users-MS:latest'
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh 'kubectl set image deployment/Users-MS Users-MS=iMrSeba/Users-MS:latest --namespace=default'
+            }
+        }
+    }
+}
